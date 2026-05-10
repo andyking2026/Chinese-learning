@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>语文每日练 · 八下</title>
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --card: #fffdf7;
+    --accent: #8c6b4a;
+    --accent-light: #d4b896;
+    --text: #333;
+    --muted: #888;
+    --green: #5a8f5a;
+    --yellow: #c9a227;
+    --red: #b85c5c;
+    --blue: #4a7ca8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+  }
+  .container { max-width: 680px; margin: 0 auto; padding: 16px; }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 2px solid var(--accent-light); margin-bottom: 16px;
+  }
+  header h1 { font-size: 1.25rem; margin: 0; color: var(--accent); }
+  header .sub { font-size: .8rem; color: var(--muted); }
+  nav { display: flex; gap: 8px; margin-bottom: 16px; }
+  nav button {
+    flex: 1; padding: 10px; border: none; border-radius: 8px;
+    background: var(--card); color: var(--accent); font-weight: 600; cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  nav button.active { background: var(--accent); color: #fff; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .today-header { text-align: center; margin-bottom: 16px; }
+  .today-header h2 { margin: 0; font-size: 1.1rem; }
+  .today-header p { margin: 4px 0 0; color: var(--muted); font-size: .9rem; }
+  .big-btn {
+    display: block; width: 100%; padding: 16px; border: none; border-radius: 12px;
+    background: var(--accent); color: #fff; font-size: 1.1rem; font-weight: 700; cursor: pointer;
+    margin-bottom: 16px; box-shadow: 0 3px 8px rgba(140,107,74,.25);
+  }
+  .big-btn:disabled { background: var(--muted); cursor: not-allowed; box-shadow: none; }
+  .big-btn.secondary { background: var(--blue); }
+  .stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .stat-box {
+    flex: 1; background: var(--card); padding: 12px; border-radius: 10px; text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .stat-box .num { font-size: 1.5rem; font-weight: 700; color: var(--accent); }
+  .stat-box .label { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+  .study-area { perspective: 1000px; margin-bottom: 16px; }
+  .flip-card {
+    background: var(--card); border-radius: 14px; min-height: 220px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.08); padding: 24px; cursor: pointer;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+    transition: transform .2s;
+  }
+  .flip-card:active { transform: scale(.98); }
+  .flip-card .type-tag {
+    display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: .7rem;
+    margin-bottom: 12px; color: #fff; background: var(--accent-light);
+  }
+  .flip-card .front { font-size: 1.4rem; font-weight: 600; }
+  .flip-card .back { font-size: 1.1rem; color: #444; margin-top: 12px; display: none; }
+  .flip-card.revealed .front { font-size: 1.15rem; color: var(--muted); }
+  .flip-card.revealed .back { display: block; }
+  .flip-card .unit-tag { margin-top: 10px; font-size: .75rem; color: var(--muted); }
+  .rate-btns { display: flex; gap: 10px; }
+  .rate-btns button {
+    flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; color: #fff;
+  }
+  .rate-btns .r-green { background: var(--green); }
+  .rate-btns .r-yellow { background: var(--yellow); }
+  .rate-btns .r-red { background: var(--red); }
+
+  .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .toolbar input, .toolbar select {
+    padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; background: #fff; font-size: .9rem;
+  }
+  .toolbar input { flex: 1; min-width: 120px; }
+  .card-list { display: flex; flex-direction: column; gap: 10px; }
+  .card-item {
+    background: var(--card); padding: 12px 14px; border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05); display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-item .cfront { font-weight: 600; }
+  .card-item .cback { font-size: .85rem; color: var(--muted); margin-top: 2px; }
+  .card-item .meta { font-size: .7rem; color: var(--muted); margin-top: 4px; }
+  .card-item .acts button {
+    border: none; background: transparent; color: var(--accent); cursor: pointer; font-size: .85rem; margin-left: 8px;
+  }
+  .form-row { margin-bottom: 10px; }
+  .form-row label { display: block; font-size: .8rem; color: var(--muted); margin-bottom: 4px; }
+  .form-row input, .form-row textarea, .form-row select {
+    width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: .95rem;
+  }
+  .form-row textarea { min-height: 80px; resize: vertical; }
+  .save-btn {
+    width: 100%; padding: 12px; border: none; border-radius: 10px; background: var(--accent); color: #fff;
+    font-weight: 700; cursor: pointer; margin-top: 6px;
+  }
+  .empty-state { text-align: center; color: var(--muted); padding: 40px 20px; }
+
+  .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px; }
+  .cal-day {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px;
+    background: var(--card); font-size: .8rem; color: var(--muted);
+  }
+  .cal-day.done { background: var(--green); color: #fff; font-weight: 700; }
+  .cal-today { outline: 2px solid var(--accent); }
+  .legend { font-size: .8rem; color: var(--muted); text-align: center; }
+
+  .toast {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: #333; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: .9rem;
+    opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 100;
+  }
+  .toast.show { opacity: 1; }
+
+  .auth-box {
+    background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .auth-box h3 { margin: 0 0 12px; font-size: 1rem; color: var(--accent); }
+  .sync-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: .7rem;
+    background: #e8e8e8; color: var(--muted); margin-left: 8px;
+  }
+  .sync-badge.online { background: var(--green); color: #fff; }
+  .hint-box {
+    background: #eef6ff; border-left: 4px solid var(--blue); padding: 12px 14px; border-radius: 8px;
+    font-size: .85rem; color: #335; margin-bottom: 14px;
+  }
+  .hint-box a { color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <h1>语文每日练 <span class="sync-badge" id="sync-badge">本地模式</span></h1>
+      <div class="sub">人教版 · 八年级下册</div>
+    </div>
+    <div class="sub" id="streak">连续 0 天</div>
+  </header>
+
+  <!-- 登录区 -->
+  <div id="auth-section" style="display:none;">
+    <div class="auth-box">
+      <h3>云同步登录</h3>
+      <div class="form-row">
+        <label>邮箱</label>
+        <input type="email" id="auth-email" placeholder="your@email.com">
+      </div>
+      <div class="form-row">
+        <label>密码</label>
+        <input type="password" id="auth-password" placeholder="不少于6位">
+      </div>
+      <button class="save-btn" onclick="signIn()" style="margin-bottom:8px;">登录</button>
+      <button class="save-btn" style="background:var(--blue);" onclick="signUp()">注册新账号</button>
+      <div style="font-size:.8rem;color:var(--muted);margin-top:10px;text-align:center;">
+        家里所有设备用同一个账号，数据自动同步
+      </div>
+    </div>
+  </div>
+
+  <div id="user-section" style="display:none;">
+    <div class="auth-box" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;">
+      <div style="font-size:.9rem;">已登录：<span id="user-email" style="font-weight:700;"></span></div>
+      <button class="save-btn" style="width:auto;padding:6px 12px;margin-top:0;font-size:.8rem;background:#888;" onclick="signOut()">退出</button>
+    </div>
+  </div>
+
+  <nav>
+    <button class="active" onclick="setTab('today')">今日任务</button>
+    <button onclick="setTab('library')">卡片库</button>
+    <button onclick="setTab('calendar')">打卡</button>
+  </nav>
+
+  <!-- 今日任务 -->
+  <div id="tab-today" class="section active">
+    <div class="today-header">
+      <h2 id="greeting">准备好，点滴进步</h2>
+      <p id="today-summary">加载中...</p>
+    </div>
+    <button id="start-btn" class="big-btn" onclick="startStudy()">开始学习</button>
+
+    <div id="seed-box" class="hint-box" style="display:none;">
+      <b>检测到你还没有学习卡片。</b><br>
+      我已为你准备好八年级下册全套 200 张知识点卡片（基础 + 文言文），一键导入即可开始学习。
+      <button class="save-btn" style="margin-top:10px;" onclick="seedBuiltInCards()">一键导入全套卡片</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="num" id="stat-new">0</div><div class="label">今日新学</div></div>
+      <div class="stat-box"><div class="num" id="stat-review">0</div><div class="label">待复习</div></div>
+      <div class="stat-box"><div class="num" id="stat-total">0</div><div class="label">卡片总数</div></div>
+    </div>
+
+    <div id="study-panel" style="display:none;">
+      <div class="study-area">
+        <div class="flip-card" id="flip-card" onclick="toggleReveal()">
+          <span class="type-tag" id="s-type">基础知识</span>
+          <div class="front" id="s-front">点击显示答案</div>
+          <div class="back" id="s-back"></div>
+          <div class="unit-tag" id="s-unit"></div>
+        </div>
+      </div>
+      <div class="rate-btns" id="rate-btns" style="display:none;">
+        <button class="r-red" onclick="rate('hard')">不会</button>
+        <button class="r-yellow" onclick="rate('fuzzy')">模糊</button>
+        <button class="r-green" onclick="rate('easy')">认识</button>
+      </div>
+      <div style="text-align:center; color:var(--muted); font-size:.85rem; margin-top:10px;">
+        进度：<span id="s-progress">1/5</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡片库 -->
+  <div id="tab-library" class="section">
+    <div class="toolbar">
+      <select id="filter-type" onchange="renderLibrary()">
+        <option value="">全部类型</option>
+        <option value="basic">基础知识</option>
+        <option value="wenyan">文言文</option>
+      </select>
+      <input type="text" id="filter-text" placeholder="搜索卡片内容..." oninput="renderLibrary()">
+      <button class="save-btn" style="width:auto; padding:8px 14px; margin-top:0;" onclick="openEditor()">+ 新建</button>
+    </div>
+    <div id="editor" style="display:none; background:var(--card); padding:14px; border-radius:12px; margin-bottom:14px;">
+      <div class="form-row">
+        <label>类型</label>
+        <select id="ed-type"><option value="basic">基础知识</option><option value="wenyan">文言文</option></select>
+      </div>
+      <div class="form-row">
+        <label>正面（问题/原文）</label>
+        <textarea id="ed-front" placeholder="例如：杳无音信 的 杳 怎么读？"></textarea>
+      </div>
+      <div class="form-row">
+        <label>背面（答案/释义）</label>
+        <textarea id="ed-back" placeholder="例如：yǎo，远得不见踪影。"></textarea>
+      </div>
+      <div class="form-row">
+        <label>单元/课文（可选）</label>
+        <input type="text" id="ed-unit" placeholder="例如：第三单元 · 桃花源记">
+      </div>
+      <button class="save-btn" onclick="saveCard()">保存卡片</button>
+      <button class="save-btn" style="background:#aaa; margin-top:8px;" onclick="closeEditor()">取消</button>
+    </div>
+    <div class="card-list" id="card-list"></div>
+  </div>
+
+  <!-- 打卡 -->
+  <div id="tab-calendar" class="section">
+    <div class="today-header">
+      <h2>本月打卡</h2>
+      <p id="month-info"></p>
+    </div>
+    <div class="calendar" id="calendar"></div>
+    <div class="legend">绿色 = 已完成打卡 · 框选 = 今天</div>
+    <div class="stats-row" style="margin-top:18px;">
+      <div class="stat-box"><div class="num" id="cal-month-count">0</div><div class="label">本月打卡</div></div>
+      <div class="stat-box"><div class="num" id="cal-streak">0</div><div class="label">连续天数</div></div>
+    </div>
+    <div style="margin-top:18px; background:var(--card); padding:14px; border-radius:12px;">
+      <div style="font-weight:700; margin-bottom:10px; color:var(--accent);">数据备份</div>
+      <div style="font-size:.85rem; color:var(--muted); margin-bottom:12px;">
+        建议每月导出一次备份，换设备或清浏览器时可恢复。
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="save-btn" style="flex:1; margin-top:0;" onclick="exportData()">导出备份文件</button>
+        <button class="save-btn" style="flex:1; margin-top:0; background:var(--green);" onclick="document.getElementById('import-file').click()">导入备份</button>
+        <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(this)">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ================== 配置区（部署前填入） ==================
+const SUPABASE_URL = 'https://htujleoquvznljtfglqe.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0dWpsZW9xdXZ6bmxqdGZnbHFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MDgwOTIsImV4cCI6MjA5Mzk4NDA5Mn0.KzBopzGf0zAJ_W6cLcrsm29G2EjbvSBSAwO3ZRiEU-Q';
+// ==========================================================
+
+const LS_CARDS = 'ch8_cards';
+const LS_RECORDS = 'ch8_records';
+const LS_STATE = 'ch8_state';
+const DAILY_NEW_LIMIT = 10;
+const DAILY_NEW_PER_TYPE = 5;
+
+let supabase = null;
+let user = null;
+let useCloud = false;
+
+let localCards = [];
+let localRecords = [];
+let localState = { todayStudy: [], date: '' };
+
+let todayQueue = [];
+let currentIndex = 0;
+let editingId = null;
+
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+// ================== Supabase 初始化 ==================
+function initSupabase() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    checkSession();
+  } catch (e) { console.error('Supabase init failed', e); }
+}
+
+async function checkSession() {
+  if (!supabase) return;
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) { setUser(session.user); }
+  else { showAuth(true); }
+}
+
+function setUser(u) {
+  user = u; useCloud = true;
+  document.getElementById('sync-badge').textContent = '云同步中';
+  document.getElementById('sync-badge').classList.add('online');
+  document.getElementById('user-email').textContent = u.email;
+  showAuth(false);
+  loadAll().then(() => { updateUI(); });
+}
+
+function showAuth(show) {
+  document.getElementById('auth-section').style.display = show ? 'block' : 'none';
+  document.getElementById('user-section').style.display = show ? 'none' : 'block';
+}
+
+async function signUp() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-password').value;
+  if (!email || pass.length < 6) { showToast('请填写有效邮箱和密码（不少于6位）'); return; }
+  const { data, error } = await supabase.auth.signUp({ email, password: pass });
+  if (error) { showToast('注册失败：' + error.message); return; }
+  showToast('注册成功，请查收邮箱验证链接（如未收到可直接登录）');
+}
+
+async function signIn() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-password').value;
+  if (!email || !pass) { showToast('请填写邮箱和密码'); return; }
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+  if (error) { showToast('登录失败：' + error.message); return; }
+  setUser(data.user);
+}
+
+async function signOut() {
+  await supabase.auth.signOut();
+  user = null; useCloud = false;
+  location.reload();
+}
+
+// ================== 数据层 ==================
+async function loadAll() {
+  try {
+    if (useCloud && user) {
+      await Promise.all([loadCardsCloud(), loadRecordsCloud()]);
+    } else {
+      localCards = safeJSON(localStorage.getItem(LS_CARDS), []);
+      localRecords = safeJSON(localStorage.getItem(LS_RECORDS), []);
+      localState = safeJSON(localStorage.getItem(LS_STATE), { todayStudy: [], date: '' });
+    }
+    if (!localState || typeof localState !== 'object') localState = { todayStudy: [], date: '' };
+    if (localState.date !== todayStr()) {
+      localState = { todayStudy: [], date: todayStr() };
+      saveState();
+    }
+  } catch (e) {
+    console.error('loadAll error', e);
+    localCards = []; localRecords = []; localState = { todayStudy: [], date: todayStr() };
+  }
+}
+
+function safeJSON(raw, fallback) {
+  try { return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
+}
+
+async function loadCardsCloud() {
+  const { data, error } = await supabase.from('cards').select('*').eq('user_id', user.id);
+  if (error) { console.error(error); return; }
+  localCards = (data || []).map(c => ({
+    id: c.id, type: c.type, front: c.front, back: c.back, unit: c.unit,
+    studied: c.studied, interval: c.interval || 0, nextReview: c.next_review || ''
+  }));
+}
+
+async function loadRecordsCloud() {
+  const { data, error } = await supabase.from('study_records').select('study_date').eq('user_id', user.id);
+  if (error) { console.error(error); return; }
+  localRecords = (data || []).map(r => r.study_date);
+}
+
+async function saveCardDB(card) {
+  if (useCloud && user) {
+    const payload = {
+      user_id: user.id, type: card.type, front: card.front, back: card.back, unit: card.unit || '',
+      studied: card.studied, interval: card.interval || 0, next_review: card.nextReview || null
+    };
+    if (card.id && !card.id.startsWith('local_')) {
+      const { error } = await supabase.from('cards').update(payload).eq('id', card.id);
+      if (error) console.error(error);
+    } else {
+      const { data, error } = await supabase.from('cards').insert({ ...payload, id: undefined }).select('id').single();
+      if (error) console.error(error);
+      else card.id = data.id;
+    }
+  }
+  persistLocal();
+}
+
+async function deleteCardDB(id) {
+  if (useCloud && user) {
+    await supabase.from('cards').delete().eq('id', id);
+  }
+  localCards = localCards.filter(c => c.id !== id);
+  persistLocal();
+}
+
+async function saveRecordDB(date) {
+  if (!localRecords.includes(date)) localRecords.push(date);
+  if (useCloud && user) {
+    await supabase.from('study_records').upsert({ user_id: user.id, study_date: date }, { onConflict: ['user_id', 'study_date'] });
+  }
+  persistLocal();
+}
+
+function persistLocal() {
+  localStorage.setItem(LS_CARDS, JSON.stringify(localCards));
+  localStorage.setItem(LS_RECORDS, JSON.stringify(localRecords));
+  localStorage.setItem(LS_STATE, JSON.stringify(localState));
+}
+
+function saveState() {
+  localStorage.setItem(LS_STATE, JSON.stringify(localState));
+}
+
+// ================== 内置卡片数据（约200张） ==================
+const BUILT_IN_CARDS = [
+  {"type":"basic","front":"《社戏》作者是谁？原名是什么？","back":"鲁迅，原名周树人。\n代表作：《呐喊》《彷徨》《朝花夕拾》","unit":"第一单元 · 社戏"},
+  {"type":"basic","front":"「归省」的「省」怎么读？意思？","back":"省：xǐng，探望、问候（多指对长辈）。\n归省：回家探望父母","unit":"第一单元 · 社戏"},
+  {"type":"basic","front":"「行辈」的「行」怎么读？意思？","back":"行：háng，排行、辈分。\n行辈：辈分","unit":"第一单元 · 社戏"},
+  {"type":"basic","front":"「撺掇」读音和意思？","back":"撺掇：cuān duo，从旁鼓动人做某事。","unit":"第一单元 · 社戏"},
+  {"type":"basic","front":"「凫水」的「凫」怎么读？意思？","back":"凫：fú，野鸭。\n凫水：游泳","unit":"第一单元 · 社戏"},
+  {"type":"basic","front":"成语：「大彻大悟」","back":"形容彻底醒悟。","unit":"第一单元 · 安塞腰鼓"},
+  {"type":"basic","front":"成语：「叹为观止」","back":"赞美看到的事物好到了极点。","unit":"第一单元 · 安塞腰鼓"},
+  {"type":"basic","front":"「亢」奋的「亢」读音？","back":"亢：kàng，极度、非常。","unit":"第一单元 · 安塞腰鼓"},
+  {"type":"basic","front":"「晦暗」读音和意思？","back":"晦暗：huì àn，昏暗，也指思想、认识等不清晰。","unit":"第一单元 · 安塞腰鼓"},
+  {"type":"basic","front":"「羁绊」读音和意思？","back":"羁绊：jī bàn，缠住不能脱身，束缚。","unit":"第一单元 · 安塞腰鼓"},
+  {"type":"basic","front":"「蓦然」的「蓦」怎么读？意思？","back":"蓦：mò，突然。\n蓦然：突然，猛然","unit":"第一单元 · 安塞腰鼓"},
+  {"type":"basic","front":"「冗」杂的「冗」读音和意思？","back":"冗：rǒng，繁杂，多余。","unit":"第一单元 · 安塞腰鼓"},
+  {"type":"basic","front":"《回延安》作者和体裁？","back":"贺敬之，现代著名诗人。\n体裁：信天游形式的现代诗","unit":"第一单元 · 回延安"},
+  {"type":"basic","front":"「糜」子的「糜」怎么读？","back":"糜：méi，糜子，一种谷物。\n注意：糜烂读 mí","unit":"第一单元 · 回延安"},
+  {"type":"basic","front":"《大自然的语言》作者？","back":"竺可桢，气象学家、地理学家。\n说明文，以物候学为说明对象","unit":"第二单元 · 大自然的语言"},
+  {"type":"basic","front":"「翩然」读音和意思？","back":"翩然：piān rán，动作轻快的样子。","unit":"第二单元 · 大自然的语言"},
+  {"type":"basic","front":"「孕育」读音和意思？","back":"孕育：yùn yù，怀胎生育，比喻既存的事物中酝酿着新事物。","unit":"第二单元 · 大自然的语言"},
+  {"type":"basic","front":"「簌簌」读音和意思？","back":"簌簌：sù sù，形容风吹叶子等的声音；也形容眼泪等纷纷落下的样子。","unit":"第二单元 · 大自然的语言"},
+  {"type":"basic","front":"「销声匿」迹，缺的那个字读音和意思？","back":"匿：nì，隐藏。\n销声匿迹：不再公开讲话，不再出头露面，形容隐藏起来或不公开出现。","unit":"第二单元 · 大自然的语言"},
+  {"type":"basic","front":"「草长莺飞」的「长」怎么读？","back":"长：zhǎng，生长。\n草长莺飞：形容江南暮春美好的景色","unit":"第二单元 · 大自然的语言"},
+  {"type":"basic","front":"「连翘」的「翘」怎么读？","back":"翘：qiáo，连翘，一种落叶灌木。\n注意：翘首也读 qiáo；翘尾巴读 qiào","unit":"第二单元 · 大自然的语言"},
+  {"type":"basic","front":"「陨石」的「陨」怎么读？","back":"陨：yǔn，坠落。","unit":"第二单元 · 阿西莫夫短文两篇"},
+  {"type":"basic","front":"「追溯」读音和意思？","back":"追溯：zhuī sù，逆流而上，向江河发源处走，比喻探索事物的由来。","unit":"第二单元 · 阿西莫夫短文两篇"},
+  {"type":"basic","front":"「天衣无缝」的意思？","back":"比喻事物周密完善，找不出什么毛病。","unit":"第二单元 · 阿西莫夫短文两篇"},
+  {"type":"basic","front":"「致密」的意思？","back":"致密：细而密，细致精密。","unit":"第二单元 · 阿西莫夫短文两篇"},
+  {"type":"basic","front":"《大雁归来》作者和国籍？","back":"利奥波德（Aldo Leopold），美国生态学家。\n选自《沙乡年鉴》","unit":"第二单元 · 大雁归来"},
+  {"type":"basic","front":"「缄默」的「缄」怎么读？意思？","back":"缄：jiān，封闭。\n缄默：闭口不说话","unit":"第二单元 · 大雁归来"},
+  {"type":"basic","front":"「雾霭」读音和意思？","back":"雾霭：wù ǎi，雾气。","unit":"第二单元 · 大雁归来"},
+  {"type":"basic","front":"「顾忌」的意思？","back":"顾忌：gù jì，恐怕对人或事物不利而有顾虑。","unit":"第二单元 · 大雁归来"},
+  {"type":"basic","front":"「目空一切」的意思？","back":"目空一切：一切都不放在眼里，形容骄傲自大，什么都看不起。","unit":"第二单元 · 大雁归来"},
+  {"type":"wenyan","front":"桃花源记 · 晋太元中，武陵人捕鱼为业\n「太元」是什么？","back":"太元：东晋孝武帝年号（376-396年）。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 缘溪行，忘路之远近\n「缘」是什么意思？","back":"缘：沿着，顺着。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 芳草鲜美，落英缤纷\n「鲜美」「落英」「缤纷」分别什么意思？","back":"鲜美：鲜嫩美丽（非指味道好）\n落英：落花\n缤纷：繁多的样子","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 复前行，欲穷其林\n「穷」是什么意思？","back":"穷：尽，形容词作动词，走到……尽头。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 林尽水源，便得一山\n翻译这句话","back":"桃林在溪水发源的地方就到头了，于是便看到一座山。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 初极狭，才通人\n「才」是什么意思？","back":"才：仅仅、只。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 复行数十步，豁然开朗\n「豁然」是什么意思？","back":"豁然：形容由狭窄幽暗突然变得开阔敞亮。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 土地平旷，屋舍俨然\n「俨然」是什么意思？","back":"俨然：整齐的样子。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 有良田、美池、桑竹之属\n「属」是什么意思？","back":"属：类。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 阡陌交通，鸡犬相闻\n「阡陌」「交通」的古义和今义？","back":"阡陌：田间小路（南北为阡，东西为陌）\n交通：古义「交错相通」，今义「运输事业」","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 黄发垂髫，并怡然自乐\n「黄发」「垂髫」分别指什么？","back":"黄发：旧说是长寿的特征，用来指老人\n垂髫：垂下来的头发，用来指小孩","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 见渔人，乃大惊\n「乃」是什么意思？","back":"乃：于是，就；竟然（此处可理解为「竟然」，表惊讶）。","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 具答之，便要还家\n「要」是什么意思？什么用法？","back":"要：yāo，通「邀」，邀请。\n通假字","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 率妻子邑人来此绝境\n「妻子」「绝境」的古义？","back":"妻子：古义「妻子和儿女」，今义「男子的配偶」\n绝境：古义「与人世隔绝的地方」，今义「没有出路的境地」","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 无论魏晋\n「无论」的古义？","back":"无论：古义「不要说，更不必说」，今义「表条件关系的连词」","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 此人一一为具言所闻\n「为」「具」是什么意思？","back":"为：wèi，对、向\n具：详细","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 未果，寻病终\n「果」「寻」是什么意思？","back":"果：实现\n寻：随即，不久","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"桃花源记 · 后遂无问津者\n「津」是什么意思？","back":"津：渡口。\n问津：询问渡口，引申为探求、访求","unit":"第三单元 · 桃花源记"},
+  {"type":"wenyan","front":"小石潭记 · 从小丘西行百二十步\n作者是谁？","back":"柳宗元，唐代文学家，「唐宋八大家」之一。\n本文选自《柳河东集》，是「永州八记」之一","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 隔篁竹，闻水声\n「篁」怎么读？意思？","back":"篁：huáng，竹林。","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 如鸣珮环，心乐之\n「乐」怎么读？用法？","back":"乐：lè，意动用法，「以……为乐」","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 伐竹取道，下见小潭\n「伐」是什么意思？","back":"伐：砍伐。","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 水尤清冽\n「尤」「冽」是什么意思？","back":"尤：格外\n冽：liè，凉","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 全石以为底\n翻译这句话","back":"（潭）以整块石头为底。\n「全石以为底」即「以全石为底」","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 近岸，卷石底以出\n「卷」怎么读？意思？","back":"卷：quán，翻卷。","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 为坻，为屿，为嵁，为岩\n「坻」「屿」「嵁」分别指什么？","back":"坻：chí，水中高地\n屿：小岛\n嵁：kān，不平的岩石","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 青树翠蔓，蒙络摇缀\n「蔓」「蒙络」「摇缀」意思？","back":"蔓：màn，藤蔓\n蒙络：蒙盖缠绕\n摇缀：摇曳牵连","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 参差披拂\n「参差」「披拂」意思？","back":"参差：cēn cī，长短不齐\n披拂：随风飘拂","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 潭中鱼可百许头\n「可」「许」是什么意思？","back":"可：大约\n许：表示约数","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 皆若空游无所依\n这句话写出了什么特点？","back":"写出了潭水的清澈透明——鱼儿像在空中游动，没有凭依，侧面烘托水的清。","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 日光下澈，影布石上\n「澈」是什么意思？","back":"澈：穿透。\n（也有版本作「彻」，意思相近）","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 佁然不动\n「佁」怎么读？意思？","back":"佁：yǐ，静止不动的样子。","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 俶尔远逝，往来翕忽\n「俶尔」「翕忽」意思？","back":"俶尔：chù ěr，忽然\n翕忽：xī hū，轻快迅疾的样子","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 斗折蛇行，明灭可见\n「斗」「蛇」是什么用法？","back":"名词作状语：\n斗：像北斗星那样\n蛇：像蛇那样\n形容溪流曲折蜿蜒","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 犬牙差互\n「犬牙」是什么用法？","back":"名词作状语：像狗的牙齿那样。\n形容两岸地势参差不齐","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 凄神寒骨，悄怆幽邃\n「凄」「寒」是什么用法？","back":"使动用法：\n凄：使……感到凄凉\n寒：使……感到寒冷","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"小石潭记 · 以其境过清，不可久居\n「清」是什么意思？","back":"清：凄清。\n（非指清澈，而是环境的冷清）","unit":"第三单元 · 小石潭记"},
+  {"type":"wenyan","front":"核舟记 · 明有奇巧人曰王叔远\n作者？朝代？","back":"魏学洢，明代散文家。\n本文选自《虞初新志》","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 罔不因势象形\n「罔不」「因」「象」是什么意思？","back":"罔不：无不，全都\n因：顺着，就着\n象：模拟","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 尝贻余核舟一\n「贻」怎么读？意思？","back":"贻：yí，赠。","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 盖大苏泛赤壁云\n「盖」「泛」「云」是什么意思？","back":"盖：表示推测，「原来是」「大概是」\n泛：泛舟，乘船游览\n云：句末语气词","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 舟首尾长约八分有奇\n「有奇」是什么意思？","back":"有：yòu，同「又」，用来连接整数和零数\n奇：jī，零数、余数","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 高可二黍许\n「可」「许」是什么意思？","back":"可：大约\n许：左右，表示约数","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 中轩敞者为舱\n「轩敞」是什么意思？","back":"轩敞：高起而宽敞。","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 箬篷覆之\n「箬」怎么读？意思？","back":"箬：ruò，箬竹叶。\n箬篷：用箬竹叶做的船篷","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 雕栏相望焉\n「相望」是什么意思？","back":"相望：左右相对。","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 清风徐来，水波不兴\n这句话出自哪里？","back":"苏轼《赤壁赋》。\n核舟上刻的就是苏轼游赤壁的情景","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 中峨冠而多髯者为东坡\n「峨冠」「髯」是什么意思？","back":"峨冠：高高的帽子（名词作动词，戴着高帽）\n髯：rán，两腮的胡子，也泛指胡须","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 椎髻仰面\n「椎髻」怎么读？意思？","back":"椎髻：chuí jì，形状像椎（槌）的发髻。\n名词作动词，梳着椎形发髻","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 其人视端容寂，若听茶声然\n「端」「容寂」是什么意思？","back":"端：端正\n容寂：神色平静","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 其色墨\n「墨」是什么意思？","back":"墨：黑色。\n（指字迹是黑色的，与前面「丹」红色相对）","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 钩画了了\n「了了」是什么意思？","back":"了了：清清楚楚。","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 珠可历历数也\n「历历」是什么意思？","back":"历历：分明的样子。","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 其船背稍夷\n「夷」是什么意思？","back":"夷：平。","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 而计其长曾不盈寸\n「曾」「盈」是什么意思？","back":"曾：zēng，竟然\n盈：满","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"核舟记 · 盖简桃核修狭者为之\n「简」是什么意思？","back":"简：挑选。\n同「拣」","unit":"第三单元 · 核舟记"},
+  {"type":"wenyan","front":"诗经二首 · 《关雎》出处？","back":"《诗经·周南》\n《诗经》是我国最早的一部诗歌总集，收录西周至春秋诗歌305篇，又称「诗三百」","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 窈窕淑女，君子好逑\n「窈窕」「好逑」意思？","back":"窈窕：yǎo tiǎo，文静美好的样子\n好逑：hǎo qiú，好的配偶。逑：配偶","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 参差荇菜，左右流之\n「参差」「流」意思？","back":"参差：cēn cī，长短不齐\n流：求取（非指水流）","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 寤寐思服\n「寤寐」「思服」意思？","back":"寤寐：wù mèi，醒时和睡时，指日日夜夜\n思服：思念。服：思念","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 悠哉悠哉，辗转反侧\n「悠」「辗转」意思？","back":"悠：忧思的样子\n辗转：翻来覆去","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 琴瑟友之\n「友」是什么用法？","back":"友：名词作动词，亲近、对……表示友好。","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 钟鼓乐之\n「乐」怎么读？用法？","back":"乐：lè，使动用法，「使……快乐」。","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 《蒹葭》出处？","back":"《诗经·秦南》","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 蒹葭苍苍，白露为霜\n「蒹葭」「苍苍」意思？","back":"蒹葭：jiān jiā，芦苇\n苍苍：茂盛的样子","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 所谓伊人，在水一方\n「伊人」意思？","back":"伊人：那人，指所爱的人。","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 溯洄从之，道阻且长\n「溯洄」读音和意思？","back":"溯洄：sù huí，逆流而上","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 溯游从之，宛在水中央\n「溯游」「宛」意思？","back":"溯游：顺流而下\n宛：仿佛，好像","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 蒹葭萋萋，白露未晞\n「萋萋」「晞」意思？","back":"萋萋：茂盛的样子\n晞：xī，干","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 蒹葭采采，白露未已\n「采采」「已」意思？","back":"采采：茂盛鲜明的样子\n已：完，这里指干","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"诗经二首 · 道阻且右\n「右」是什么意思？","back":"右：向右迂曲。\n古人以右为迂回弯曲","unit":"第三单元 · 诗经二首"},
+  {"type":"wenyan","front":"课外古诗词 · 式微，式微，胡不归？\n「式微」意思？","back":"式微：天黑了。式，发语词；微，昏暗。","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 微君之故，胡为乎中露？\n「微」「中露」意思？","back":"微：如果不是\n中露：露水中，指在露天","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 青青子衿，悠悠我心\n「子衿」「悠悠」意思？","back":"子衿：你的衣领。子，你；衿，jīn，衣领\n悠悠：深思的样子","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 纵我不往，子宁不嗣音？\n「嗣音」意思？","back":"嗣音：传音讯。嗣，sì，继续","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 城阙辅三秦，风烟望五津\n作者？「阙」「津」意思？","back":"王勃《送杜少府之任蜀州》\n阙：què，宫门前的望楼\n津：渡口","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 海内存知己，天涯若比邻\n「知己」「比邻」意思？","back":"知己：知心朋友\n比邻：近邻","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 无为在歧路，儿女共沾巾\n「无为」「歧路」「沾巾」意思？","back":"无为：不要\n歧路：岔路口，指分手之处\n沾巾：泪水沾湿衣巾","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 八月湖水平，涵虚混太清\n作者？「涵虚」「太清」意思？","back":"孟浩然《望洞庭湖赠张丞相》\n涵虚：包含天空，指天倒映在水中\n太清：天空","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 气蒸云梦泽，波撼岳阳城\n「蒸」「撼」妙在何处？","back":"蒸：写出湖面水汽蒸腾、弥漫的壮阔\n撼：写出波涛汹涌、撼动城池的气势","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 欲济无舟楫，端居耻圣明\n「济」「楫」「端居」「耻」意思？","back":"济：渡\n楫：jí，船桨，代指船\n端居：闲居\n耻：意动，以……为耻","unit":"第三单元 · 课外古诗词"},
+  {"type":"wenyan","front":"课外古诗词 · 坐观垂钓者，徒有羡鱼情\n典故和寓意？","back":"典出《淮南子》「临渊羡鱼，不如退而结网」。\n寓意：想做官而无人引荐，空有愿望无法实现","unit":"第三单元 · 课外古诗词"},
+  {"type":"basic","front":"《最后一次讲演》作者？","back":"闻一多，现代诗人、学者、民主战士。\n本文是他在李公朴追悼会上的即兴演讲","unit":"第四单元 · 最后一次讲演"},
+  {"type":"basic","front":"《应有格物致知精神》作者？","back":"丁肇中，美籍华裔物理学家，诺贝尔物理学奖获得者","unit":"第四单元 · 应有格物致知精神"},
+  {"type":"basic","front":"《我一生中的重要抉择》作者？","back":"王选，计算机文字信息处理专家，被誉为「当代毕昇」","unit":"第四单元 · 我一生中的重要抉择"},
+  {"type":"basic","front":"《庆祝奥林匹克运动复兴25周年》作者？","back":"顾拜旦，法国教育家、社会活动家，现代奥林匹克运动创始人","unit":"第四单元 · 庆祝奥林匹克运动复兴25周年"},
+  {"type":"basic","front":"《壶口瀑布》作者？","back":"梁衡，当代作家","unit":"第五单元 · 壶口瀑布"},
+  {"type":"basic","front":"「震耳欲聋」意思？","back":"形容声音很大，耳朵都快震聋了。","unit":"第五单元 · 壶口瀑布"},
+  {"type":"basic","front":"「前呼后拥」意思？","back":"前面有人吆喝开路，后面有人围着保护。形容官员出行随从众多","unit":"第五单元 · 壶口瀑布"},
+  {"type":"basic","front":"《在长江源头各拉丹冬》作者？","back":"马丽华，当代女作家","unit":"第五单元 · 在长江源头各拉丹冬"},
+  {"type":"basic","front":"「目眩神迷」的「眩」怎么读？意思？","back":"眩：xuàn，眼睛昏花\n目眩神迷：形容所见令人惊异","unit":"第五单元 · 一滴水经过丽江"},
+  {"type":"wenyan","front":"庄子二则 · 北冥有鱼，其名为鲲\n「冥」怎么读？意思？","back":"冥：míng，同「溟」，海。\n北冥：北海","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 鲲之大，不知其几千里也\n「鲲」是什么？","back":"鲲：kūn，大鱼名","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 化而为鸟，其名为鹏\n「鹏」是什么？","back":"鹏：大鸟名","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 怒而飞，其翼若垂天之云\n「怒」是什么意思？","back":"怒：振奋，这里指鼓起翅膀。","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 是鸟也，海运则将徙于南冥\n「海运」是什么意思？","back":"海运：海水运动，这里指汹涌的海涛。\n古人认为大鹏起飞需借助大海的波涛","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 水击三千里，抟扶摇而上者九万里\n「抟」「扶摇」意思？","back":"抟：tuán，盘旋飞翔\n扶摇：旋风","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 去以六月息者也\n「去」「息」意思？","back":"去：离开\n息：气息，这里指风","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 天之苍苍，其正色邪\n「苍苍」「正色」「邪」意思？","back":"苍苍：湛蓝\n正色：真正的颜色\n邪：yé，语气词，同「耶」","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 其视下也，亦若是则已矣\n「是」「已」意思？","back":"是：这样\n已：罢了","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 庄子与惠子游于濠梁之上\n「濠梁」意思？","back":"濠梁：濠水的桥上。濠：háo，水名，在今安徽凤阳","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 鲦鱼出游从容，是鱼之乐也\n「鲦」怎么读？","back":"鲦：tiáo，一种淡水小鱼","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 子非鱼，安知鱼之乐\n「安」是什么意思？","back":"安：怎么，哪里。\n表反问","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 子非我，安知我不知鱼之乐\n这句话的逻辑是什么？","back":"庄子用惠子的逻辑反击惠子：你不是我，怎么知道我不知道鱼的快乐？\n体现了庄子机智善辩","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"庄子二则 · 请循其本\n「循」「本」意思？","back":"循：追溯\n本：本原，开头","unit":"第六单元 · 庄子二则"},
+  {"type":"wenyan","front":"礼记二则 · 虽有嘉肴，弗食，不知其旨也\n「嘉肴」「弗」「旨」意思？","back":"嘉肴：美味的菜\n弗：不\n旨：味美","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 虽有至道，弗学，不知其善也\n「至道」「善」意思？","back":"至道：最好的道理\n善：好处","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 是故学然后知不足\n「是故」意思？","back":"是故：所以","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 教学相长\n「长」怎么读？意思？","back":"长：zhǎng，促进，增长。\n教学相长：教与学互相推动、互相促进","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 知不足，然后能自反也\n「自反」意思？","back":"自反：自我反思。","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 知困，然后能自强也\n「困」「自强」意思？","back":"困：困惑\n自强：自我勉励。强：qiǎng，勉励","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 大道之行也，天下为公\n出处？「大道」「为公」意思？","back":"《礼记·礼运》\n大道：指儒家推崇的上古时代的政治制度\n为公：是公共的","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 选贤与能，讲信修睦\n「与」是什么意思？","back":"与：jǔ，同「举」，推举。\n通假字","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 矜、寡、孤、独、废疾者皆有所养\n「矜」怎么读？意思？","back":"矜：guān，同「鳏」，老而无妻的人。\n通假字","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 男有分，女有归\n「分」「归」意思？","back":"分：fèn，职分，职守\n归：女子出嫁","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 货恶其弃于地也，不必藏于己\n「恶」怎么读？意思？","back":"恶：wù，憎恶。\n句意：财物，厌恶把它扔在地上，不是一定要据为己有","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"礼记二则 · 力恶其不出于身也，不必为己\n翻译这句话","back":"力气，厌恶它不出于自己，但愿意多出力并不是为了自己的私利。","unit":"第六单元 · 礼记二则"},
+  {"type":"wenyan","front":"马说 · 世有伯乐，然后有千里马\n作者？","back":"韩愈，唐代文学家，「唐宋八大家」之一","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 祇辱于奴隶人之手\n「祇」怎么读？意思？","back":"祇：zhǐ，同「只」，仅。\n（注意：祇、祗、衹、只的区分）","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 骈死于槽枥之间\n「骈」「槽枥」读音和意思？","back":"骈：pián，两马并驾，引申为并列\n槽枥：cáo lì，马槽","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 一食或尽粟一石\n「食」「或」「石」怎么读？","back":"食：shí，吃\n或：有时\n石：dàn，容量单位，十斗为一石","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 食马者不知其能千里而食也\n两个「食」怎么读？意思？","back":"两个「食」都读 sì，同「饲」，喂养。\n通假字","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 是马也，虽有千里之能\n「是」是什么意思？","back":"是：这样，这。\n（代词，非「是非」的是）","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 食不饱，力不足，才美不外见\n「见」怎么读？意思？","back":"见：xiàn，同「现」，表现、显露。\n通假字","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 且欲与常马等不可得\n「且」「等」意思？","back":"且：犹，尚且\n等：等同，一样","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 策之不以其道\n「策」是什么用法？","back":"策：名词作动词，用马鞭驱赶。","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 食之不能尽其材\n「材」是什么意思？","back":"材：才能、才干。\n同「才」","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 鸣之而不能通其意\n「通」是什么意思？","back":"通：通晓，明白。","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 执策而临之\n「临」是什么意思？","back":"临：面对。","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"马说 · 其真无马邪？其真不知马也！\n两个「其」怎么理解？","back":"第一个「其」：表反问，难道\n第二个「其」：表感叹，大概、其实\n翻译：难道真的没有千里马吗？其实是他们真不识得千里马啊！","unit":"第六单元 · 马说"},
+  {"type":"wenyan","front":"唐诗三首 · 《石壕吏》作者？背景？","back":"杜甫，唐代伟大的现实主义诗人。\n背景：安史之乱中，杜甫夜宿石壕村，目睹官吏抓丁","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 暮投石壕村，有吏夜捉人\n「投」意思？","back":"投：投宿。","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 老翁逾墙走，老妇出门看\n「逾」「走」的古义？","back":"逾：越过\n走：古义「跑」，今义「行走」","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 吏呼一何怒，妇啼一何苦\n「一何」意思？","back":"一何：多么。\n表感叹","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 三男邺城戍\n「戍」怎么读？意思？","back":"戍：shù，防守。\n（注意与「戊wù」「戌xū」区分）","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 一男附书至，二男新战死\n「附书」「新」意思？","back":"附书：捎信\n新：最近","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 存者且偷生，死者长已矣\n「且」「偷生」「长已矣」意思？","back":"且：姑且\n偷生：苟且活着\n长已矣：永远完了","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 夜久语声绝，如闻泣幽咽\n「绝」「幽咽」意思？","back":"绝：断绝，停止\n幽咽：yè，低微断续的哭声","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 《茅屋为秋风所破歌》作者？体裁？","back":"杜甫，古体诗（歌行体）","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 八月秋高风怒号，卷我屋上三重茅\n「秋高」「三重」意思？","back":"秋高：秋深\n三重：多层","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 高者挂罥长林梢\n「罥」怎么读？意思？","back":"罥：juàn，缠绕，挂。","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 下者飘转沉塘坳\n「塘坳」意思？","back":"塘坳：ào，低洼积水的地方。","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 布衾多年冷似铁\n「衾」怎么读？意思？","back":"衾：qīn，被子。","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 娇儿恶卧踏里裂\n「恶卧」意思？","back":"恶卧：睡相不好。","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 床头屋漏无干处\n「屋漏」是什么意思？","back":"屋漏：雨水从屋顶漏下来。\n（非指屋子角落，古人有「屋漏」指屋内西北角的说法，此处取前说）","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 雨脚如麻未断绝\n「雨脚」意思？","back":"雨脚：像线一样密集的雨点。","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 自经丧乱少睡眠\n「丧乱」指什么？","back":"丧乱：战乱，指安史之乱。","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 安得广厦千万间，大庇天下寒士俱欢颜\n「安得」「广厦」「庇」「寒士」意思？","back":"安得：如何能得到\n广厦：宽敞的大屋\n庇：bì，遮蔽，保护\n寒士：贫寒的读书人","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 何时眼前突兀见此屋\n「突兀」「见」意思？","back":"突兀：wù，高耸的样子\n见：xiàn，同「现」，出现","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 《卖炭翁》作者？","back":"白居易，唐代诗人，新乐府运动倡导者","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 伐薪烧炭南山中\n「薪」意思？","back":"薪：木柴。","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 满面尘灰烟火色，两鬓苍苍十指黑\n「烟火色」「苍苍」意思？","back":"烟火色：被烟熏火燎的脸色\n苍苍：灰白","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 可怜身上衣正单，心忧炭贱愿天寒\n「可怜」「贱」意思？","back":"可怜：值得怜悯\n贱：价格低","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 夜来城外一尺雪，晓驾炭车辗冰辙\n「晓」「辗」意思？","back":"晓：早晨\n辗：niǎn，碾压","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 牛困人饥日已高，市南门外泥中歇\n这句写出了什么？","back":"写出了卖炭翁长途跋涉后的极度疲惫，以及被盘剥前的艰难处境","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 翩翩两骑来是谁？黄衣使者白衫儿\n「翩翩」「骑」怎么读？","back":"翩翩：轻快的样子（此处含讽刺）\n骑：jì，骑马的人","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 手把文书口称敕，回车叱牛牵向北\n「把」「敕」「叱」意思？","back":"把：拿\n敕：chì，皇帝的命令\n叱：chì，大声呵斥","unit":"第六单元 · 唐诗三首"},
+  {"type":"wenyan","front":"唐诗三首 · 半匹红纱一丈绫，系向牛头充炭直\n「系」「直」意思？","back":"系：jì，绑\n直：同「值」，价钱\n通假字","unit":"第六单元 · 唐诗三首"}
+];
+
+// ================== 核心逻辑 ==================
+function updateUI() {
+  updateTodayStats();
+  renderLibrary();
+  renderCalendar();
+  updateStreak();
+  if (localCards.length === 0 && document.getElementById('study-panel').style.display !== 'block') {
+    document.getElementById('seed-box').style.display = 'block';
+  } else {
+    document.getElementById('seed-box').style.display = 'none';
+  }
+}
+
+function getTodayQueue() {
+  const today = todayStr();
+  const unstudied = localCards.filter(c => !c.studied);
+  const basicNew = unstudied.filter(c => c.type === 'basic').slice(0, DAILY_NEW_PER_TYPE);
+  const wenyanNew = unstudied.filter(c => c.type === 'wenyan').slice(0, DAILY_NEW_PER_TYPE);
+  let newCards = [...basicNew, ...wenyanNew];
+  if (newCards.length > DAILY_NEW_LIMIT) newCards = newCards.slice(0, DAILY_NEW_LIMIT);
+  const reviewCards = localCards.filter(c => {
+    if (!c.studied) return false;
+    if (localState.todayStudy.includes(c.id)) return false;
+    return (c.nextReview || '') <= today;
+  });
+  return { newCards, reviewCards };
+}
+
+function updateTodayStats() {
+  const { newCards, reviewCards } = getTodayQueue();
+  const total = localCards.length;
+  const basicCount = newCards.filter(c => c.type === 'basic').length;
+  const wenyanCount = newCards.filter(c => c.type === 'wenyan').length;
+  document.getElementById('stat-new').textContent = newCards.length;
+  document.getElementById('stat-review').textContent = reviewCards.length;
+  document.getElementById('stat-total').textContent = total;
+  const btn = document.getElementById('start-btn');
+  if (total === 0) {
+    // 空库引导
+    document.getElementById('today-summary').textContent = '暂无学习卡片，请先导入八年级下册知识点';
+    btn.textContent = '导入 200 张卡片，开始学习';
+    btn.disabled = false;
+    btn.onclick = seedBuiltInCards;
+    document.getElementById('greeting').textContent = '第一步：导入卡片';
+    return;
+  }
+  // 恢复默认点击行为
+  btn.onclick = startStudy;
+  const summary = `今日新学 ${newCards.length} 张（基础${basicCount} + 文言${wenyanCount}）· 待复习 ${reviewCards.length} 张`;
+  document.getElementById('today-summary').textContent = summary;
+  if (newCards.length + reviewCards.length === 0) {
+    btn.textContent = '今日任务已完成 ✓';
+    btn.disabled = true;
+    document.getElementById('greeting').textContent = '今日已达标，休息一下吧';
+  } else {
+    btn.textContent = '开始学习';
+    btn.disabled = false;
+    document.getElementById('greeting').textContent = '准备好，点滴进步';
+  }
+}
+
+function startStudy() {
+  const { newCards, reviewCards } = getTodayQueue();
+  todayQueue = [...newCards, ...reviewCards];
+  currentIndex = 0;
+  if (todayQueue.length === 0) { showToast('今日没有任务了'); return; }
+  document.getElementById('start-btn').style.display = 'none';
+  document.getElementById('seed-box').style.display = 'none';
+  document.getElementById('study-panel').style.display = 'block';
+  showCard();
+}
+
+function showCard() {
+  const c = todayQueue[currentIndex];
+  const cardEl = document.getElementById('flip-card');
+  cardEl.classList.remove('revealed');
+  document.getElementById('s-type').textContent = c.type === 'wenyan' ? '文言文' : '基础知识';
+  document.getElementById('s-front').textContent = c.front;
+  document.getElementById('s-back').textContent = c.back;
+  document.getElementById('s-unit').textContent = c.unit || '';
+  document.getElementById('rate-btns').style.display = 'none';
+  document.getElementById('s-progress').textContent = (currentIndex + 1) + '/' + todayQueue.length;
+}
+
+function toggleReveal() {
+  document.getElementById('flip-card').classList.add('revealed');
+  document.getElementById('rate-btns').style.display = 'flex';
+}
+
+async function rate(level) {
+  const c = todayQueue[currentIndex];
+  if (!c.studied) c.studied = true;
+  let interval = c.interval || 0;
+  if (level === 'easy') {
+    interval = interval === 0 ? 2 : Math.floor(interval * 2.5) + 1;
+  } else if (level === 'fuzzy') {
+    interval = 1;
+  } else {
+    interval = 0;
+  }
+  c.interval = interval;
+  const next = new Date(); next.setDate(next.getDate() + interval);
+  c.nextReview = next.toISOString().slice(0,10);
+  if (!localState.todayStudy.includes(c.id)) localState.todayStudy.push(c.id);
+  await saveCardDB(c);
+  saveState();
+  currentIndex++;
+  if (currentIndex >= todayQueue.length) {
+    finishStudy();
+  } else {
+    showCard();
+  }
+}
+
+async function finishStudy() {
+  document.getElementById('study-panel').style.display = 'none';
+  document.getElementById('start-btn').style.display = 'block';
+  document.getElementById('start-btn').disabled = true;
+  document.getElementById('start-btn').textContent = '今日任务已完成 ✓';
+  document.getElementById('greeting').textContent = '今日已达标，休息一下吧';
+  const today = todayStr();
+  await saveRecordDB(today);
+  showToast('今日任务完成！+1 打卡');
+  updateTodayStats();
+  renderCalendar();
+  updateStreak();
+}
+
+function updateStreak() {
+  const rec = localRecords.slice().sort();
+  let streak = 0;
+  const d = new Date();
+  while (true) {
+    const s = d.toISOString().slice(0,10);
+    if (rec.includes(s)) { streak++; d.setDate(d.getDate()-1); }
+    else if (s === todayStr() && streak === 0) { d.setDate(d.getDate()-1); }
+    else break;
+  }
+  document.getElementById('streak').textContent = '连续 ' + streak + ' 天';
+  return streak;
+}
+
+function renderCalendar() {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  document.getElementById('month-info').textContent = y + '年' + (m+1) + '月';
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const cal = document.getElementById('calendar');
+  cal.innerHTML = '';
+  const headers = ['日','一','二','三','四','五','六'];
+  headers.forEach(h => {
+    const el = document.createElement('div');
+    el.textContent = h; el.style.fontWeight = '700'; el.style.color = 'var(--accent)';
+    cal.appendChild(el);
+  });
+  for (let i=0;i<firstDay;i++) cal.appendChild(document.createElement('div'));
+  let doneCount = 0;
+  for (let d=1; d<=daysInMonth; d++) {
+    const s = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+    if (localRecords.includes(s)) { el.classList.add('done'); doneCount++; }
+    if (s === todayStr()) el.classList.add('cal-today');
+    cal.appendChild(el);
+  }
+  document.getElementById('cal-month-count').textContent = doneCount;
+  document.getElementById('cal-streak').textContent = updateStreak();
+}
+
+function renderLibrary() {
+  const ft = document.getElementById('filter-type').value;
+  const fx = document.getElementById('filter-text').value.trim();
+  const list = document.getElementById('card-list');
+  list.innerHTML = '';
+  const filtered = localCards.filter(c => {
+    if (ft && c.type !== ft) return false;
+    if (fx && !(c.front+c.back+c.unit).includes(fx)) return false;
+    return true;
+  });
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">还没有卡片，点击右上角「+ 新建」添加，或从今日任务页一键导入。</div>';
+    return;
+  }
+  filtered.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'card-item';
+    el.innerHTML = `<div>
+      <div class="cfront">${escapeHtml(c.front)} <span style="font-size:.7rem;color:var(--muted);">[${c.type==='wenyan'?'文言文':'基础'}]</span></div>
+      <div class="cback">${escapeHtml(c.back)}</div>
+      ${c.unit?`<div class="meta">${escapeHtml(c.unit)}</div>`:''}
+    </div>
+    <div class="acts">
+      <button onclick="editCard('${c.id}')">编辑</button>
+      <button onclick="deleteCard('${c.id}')">删除</button>
+    </div>`;
+    list.appendChild(el);
+  });
+}
+
+function openEditor() {
+  editingId = null;
+  document.getElementById('ed-type').value = 'basic';
+  document.getElementById('ed-front').value = '';
+  document.getElementById('ed-back').value = '';
+  document.getElementById('ed-unit').value = '';
+  document.getElementById('editor').style.display = 'block';
+}
+function closeEditor() {
+  document.getElementById('editor').style.display = 'none';
+  editingId = null;
+}
+async function saveCard() {
+  const type = document.getElementById('ed-type').value;
+  const front = document.getElementById('ed-front').value.trim();
+  const back = document.getElementById('ed-back').value.trim();
+  const unit = document.getElementById('ed-unit').value.trim();
+  if (!front || !back) { showToast('请填写正面和背面内容'); return; }
+  if (editingId) {
+    const c = localCards.find(x => x.id === editingId);
+    if (c) { c.type = type; c.front = front; c.back = back; c.unit = unit; await saveCardDB(c); }
+  } else {
+    const newCard = { id: 'local_' + Date.now(), type, front, back, unit, studied: false, interval: 0, nextReview: '' };
+    localCards.push(newCard);
+    await saveCardDB(newCard);
+  }
+  closeEditor();
+  renderLibrary();
+  updateTodayStats();
+  showToast('保存成功');
+}
+function editCard(id) {
+  const c = localCards.find(x => x.id === id);
+  if (!c) return;
+  editingId = id;
+  document.getElementById('ed-type').value = c.type;
+  document.getElementById('ed-front').value = c.front;
+  document.getElementById('ed-back').value = c.back;
+  document.getElementById('ed-unit').value = c.unit || '';
+  document.getElementById('editor').style.display = 'block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function deleteCard(id) {
+  if (!confirm('确定删除这张卡片吗？')) return;
+  await deleteCardDB(id);
+  renderLibrary();
+  updateTodayStats();
+  showToast('已删除');
+}
+
+async function seedBuiltInCards() {
+  const existing = new Set(localCards.map(c => c.front + c.back));
+  let added = 0;
+  for (const item of BUILT_IN_CARDS) {
+    const key = item.front + item.back;
+    if (existing.has(key)) continue;
+    const card = { id: 'local_' + Date.now() + '_' + added, type: item.type, front: item.front, back: item.back, unit: item.unit || '', studied: false, interval: 0, nextReview: '' };
+    localCards.push(card);
+    existing.add(key);
+    added++;
+  }
+  persistLocal();
+  if (useCloud && user) {
+    showToast('正在云端同步，请稍候...');
+    for (const c of localCards) {
+      if (c.id.startsWith('local_')) await saveCardDB(c);
+    }
+  }
+  document.getElementById('seed-box').style.display = 'none';
+  updateUI();
+  showToast(`成功导入 ${added} 张卡片！`);
+}
+
+function setTab(name) {
+  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+  if (name === 'library') renderLibrary();
+  if (name === 'calendar') renderCalendar();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function escapeHtml(t) {
+  const d = document.createElement('div'); d.textContent = t; return d.innerHTML;
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify({ cards: localCards, records: localRecords }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '语文每日练_备份_' + todayStr() + '.json';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('备份文件已下载');
+}
+function importData(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const obj = JSON.parse(e.target.result);
+      if (!Array.isArray(obj.cards) || !Array.isArray(obj.records)) throw new Error('格式不对');
+      if (!confirm(`确认导入？这将覆盖当前数据（现有 ${localCards.length} 张卡片）。`)) return;
+      localCards = obj.cards; localRecords = obj.records;
+      localState = { todayStudy: [], date: todayStr() };
+      persistLocal();
+      if (useCloud && user) {
+        showToast('正在同步到云端...');
+        await supabase.from('cards').delete().eq('user_id', user.id);
+        await supabase.from('study_records').delete().eq('user_id', user.id);
+        for (const c of localCards) await saveCardDB(c);
+        for (const r of localRecords) await saveRecordDB(r);
+      }
+      updateUI(); showToast('导入成功');
+    } catch (err) { showToast('导入失败：文件格式不对'); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ================== 启动 ==================
+initSupabase();
+loadAll().then(() => {
+  // 如果读到的是旧版数据（没有正常初始化），自动重置
+  if (!Array.isArray(localCards) || localCards.some(c => !c.id || !c.front)) {
+    localCards = []; localRecords = []; localState = { todayStudy: [], date: todayStr() };
+    persistLocal();
+  }
+  updateUI();
+  updateUI();
+  // 如果未配置Supabase，显示本地模式提示
+  if (!supabase) {
+    document.getElementById('auth-section').style.display = 'block';
+    document.getElementById('auth-section').innerHTML = `
+      <div class="hint-box">
+        <b>当前为本地模式</b>，数据只存在这台设备的浏览器里。<br>
+        如需家里多设备同步，请先在「打卡」页导出备份，或配置云同步（后续可升级）。
+      </div>`;
+  }
+}).catch(err => {
+  console.error('Init failed', err);
+  localCards = []; localRecords = []; localState = { todayStudy: [], date: todayStr() };
+  document.getElementById('today-summary').innerHTML = '<span style="color:var(--red)">初始化出错：' + escapeHtml(String(err)) + '</span>';
+  updateUI();
+});
+</script>
+</body>
+</html>
