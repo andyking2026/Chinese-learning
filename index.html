@@ -288,7 +288,6 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // ================== 配置区（部署前填入） ==================
 const SUPABASE_URL = 'https://htujleoquvznljtfglqe.supabase.co';
@@ -319,6 +318,7 @@ function todayStr() { return new Date().toISOString().slice(0,10); }
 function initSupabase() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
   if (window.location.protocol === 'file:') return; // 本地文件直接走本地模式，不连云端
+  if (typeof window.supabase === 'undefined' || !window.supabase.createClient) return; // CDN未加载
   try {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     checkSession();
@@ -978,13 +978,24 @@ function showBootError(msg) {
   if (el) el.innerHTML = '<span style="color:var(--red)">' + msg + '</span>';
 }
 
+// 调试：在页面上显示执行进度
+function setBootMsg(msg) {
+  const el = document.getElementById('today-summary');
+  if (el) el.textContent = msg;
+}
+
+setBootMsg('脚本开始执行...');
+
 try {
   initSupabase();
 } catch (e) {
   console.error('Supabase init error', e);
 }
 
+setBootMsg('初始化完成，加载数据中...');
+
 loadAll().then(() => {
+  setBootMsg('数据加载完成，更新界面...');
   try {
     if (!Array.isArray(localCards) || localCards.some(c => !c || !c.id || !c.front)) {
       localCards = []; localRecords = []; localState = { todayStudy: [], date: todayStr() };
@@ -1013,7 +1024,7 @@ loadAll().then(() => {
 // 3秒保险：如果仍然显示"加载中"，强制刷新UI
 setTimeout(function() {
   const el = document.getElementById('today-summary');
-  if (el && el.textContent.trim() === '加载中...') {
+  if (el && el.textContent.trim().indexOf('加载中') !== -1) {
     try {
       if (!Array.isArray(localCards)) localCards = [];
       updateUI();
