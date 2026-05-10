@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>语文每日练 · 八下</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
   :root {
     --bg: #f5f1e8;
@@ -317,6 +318,7 @@ function todayStr() { return new Date().toISOString().slice(0,10); }
 // ================== Supabase 初始化 ==================
 function initSupabase() {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return;
+  if (window.location.protocol === 'file:') return; // 本地文件直接走本地模式，不连云端
   try {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     checkSession();
