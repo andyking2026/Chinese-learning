@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>语文每日练 · 八下</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
   :root {
     --bg: #f5f1e8;
@@ -289,6 +288,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // ================== 配置区（部署前填入） ==================
 const SUPABASE_URL = 'https://htujleoquvznljtfglqe.supabase.co';
@@ -973,30 +973,55 @@ function importData(input) {
 }
 
 // ================== 启动 ==================
-initSupabase();
+function showBootError(msg) {
+  const el = document.getElementById('today-summary');
+  if (el) el.innerHTML = '<span style="color:var(--red)">' + msg + '</span>';
+}
+
+try {
+  initSupabase();
+} catch (e) {
+  console.error('Supabase init error', e);
+}
+
 loadAll().then(() => {
-  // 如果读到的是旧版数据（没有正常初始化），自动重置
-  if (!Array.isArray(localCards) || localCards.some(c => !c.id || !c.front)) {
-    localCards = []; localRecords = []; localState = { todayStudy: [], date: todayStr() };
-    persistLocal();
-  }
-  updateUI();
-  updateUI();
-  // 如果未配置Supabase，显示本地模式提示
-  if (!supabase) {
-    document.getElementById('auth-section').style.display = 'block';
-    document.getElementById('auth-section').innerHTML = `
-      <div class="hint-box">
-        <b>当前为本地模式</b>，数据只存在这台设备的浏览器里。<br>
-        如需家里多设备同步，请先在「打卡」页导出备份，或配置云同步（后续可升级）。
-      </div>`;
+  try {
+    if (!Array.isArray(localCards) || localCards.some(c => !c || !c.id || !c.front)) {
+      localCards = []; localRecords = []; localState = { todayStudy: [], date: todayStr() };
+      persistLocal();
+    }
+    updateUI();
+    if (!supabase) {
+      const authSec = document.getElementById('auth-section');
+      if (authSec) {
+        authSec.style.display = 'block';
+        authSec.innerHTML = '<div class="hint-box"><b>当前为本地模式</b>，数据只存在这台设备的浏览器里。<br>如需家里多设备同步，请先在「打卡」页导出备份，或配置云同步（后续可升级）。</div>';
+      }
+    }
+  } catch (e) {
+    console.error('UI init error', e);
+    showBootError('UI初始化出错：' + e.message);
+    try { updateUI(); } catch(e2) {}
   }
 }).catch(err => {
-  console.error('Init failed', err);
+  console.error('Data load error', err);
   localCards = []; localRecords = []; localState = { todayStudy: [], date: todayStr() };
-  document.getElementById('today-summary').innerHTML = '<span style="color:var(--red)">初始化出错：' + escapeHtml(String(err)) + '</span>';
-  updateUI();
+  showBootError('数据加载出错：' + (err && err.message ? err.message : String(err)));
+  try { updateUI(); } catch(e) {}
 });
+
+// 3秒保险：如果仍然显示"加载中"，强制刷新UI
+setTimeout(function() {
+  const el = document.getElementById('today-summary');
+  if (el && el.textContent.trim() === '加载中...') {
+    try {
+      if (!Array.isArray(localCards)) localCards = [];
+      updateUI();
+    } catch (e) {
+      showBootError('启动超时，请刷新重试。如果持续出错，尝试清除浏览器缓存。');
+    }
+  }
+}, 3000);
 </script>
 </body>
 </html>
